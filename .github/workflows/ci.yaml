@@ -32,6 +32,7 @@ jobs:
 
       - name: Plan artifact
         uses: actions/upload-artifact@v4
+        with:
           name: terraform plan
           path: tfplan
 
