@@ -6,8 +6,8 @@ on:
       - main
 
 permissions:
-  - id-token: write
-    contents: read
+  id-token: write
+  contents: read
 
 jobs:
   plan:
@@ -18,11 +18,14 @@ jobs:
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
         with: 
-          role-to-assume: {{ vars.ROLE_ARN }}
+          role-to-assume: ${{ vars.ROLE_ARN }}
           aws-region: us-east-1
 
+      - name: Terraform setup
+        uses: hashicorp/setup-terraform@v3
+
       - name: Terraform init
-        run: terraform init -backend-config="bucket="{{ vars.BUCKET_NAME }}
+        run: terraform init -backend-config="bucket=${{ vars.BUCKET_NAME }}"
 
       - name: Terraform validate
         run: terraform validate
@@ -42,16 +45,19 @@ jobs:
     environment: production
 
     steps:
-      - uses: actions/checkout@V4
+      - uses: actions/checkout@v4
 
       - name: AWS credentials
-        uses: actions/configure-aws-credentials@v4
+        uses: aws-actions/configure-aws-credentials@v4
         with:
-          role-to-assume: {{ vars.ROLE_ARN }}
+          role-to-assume: ${{ vars.ROLE_ARN }}
           aws-region: us-east-1
 
+      - name: Terraform setup
+        uses: hashicorp/setup-terraform@v3
+
       - name: Terraform init
-        run: terraform init -backend-config="bucket="{{ vars.BUCKET_NAME }}
+        run: terraform init -backend-config="bucket=${{ vars.BUCKET_NAME }}"
 
       - name: Download plan
         uses: actions/download-artifact@v4
